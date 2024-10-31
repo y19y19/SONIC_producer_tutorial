@@ -1,5 +1,5 @@
 ============= 
-SONIC_producer_tutorial
+SONIC producer tutorial
 =============
 
 Project description: An tutorial of writing a producer for a ML model to make inference with SONIC interface in the CMSSW. It uses ParticleTransformer as an example for with Run3 2023 AOD->MiniAOD data processing step.
@@ -38,6 +38,8 @@ Process the workflow
     cmsrel CMSSW_14_1_0_pre0
     cd CMSSW_14_1_0_pre0/src/
     cmsenv
+    git cms-init
+    scram b -j 10
 
 - Step 3: Generate the cmsConfig file.
 
@@ -63,6 +65,56 @@ Copy and run the a python script ``plotParTAK4.py`` that is provided by this rep
     python3 plotParTAK4.py
 
 Please check the script and see how it extract information from MiniAOD file and creates histograms of the inference results.
+
+.. note:: 
+
+How to confirm if an algorithm is being called in AOD -> MiniAOD process?
+It is usually under ``PhysicsTools/PatAlgos/`` in `cmssw <https://github.com/cms-sw/cmssw/blob/CMSSW_14_1_0_pre0/PhysicsTools/PatAlgos/python/slimming/applyDeepBtagging_cff.py>`_
+
+.. note::
+Do you know where the producer is defined? See the next section... 
+
+Original Producer
+=============
+- Step 1: Check out the following packages under ``$CMSSW_BASE/src/`` and compile.
+
+.. code-block:: bash
+
+    git cms-addpkg RecoBTag/ONNXRuntime
+    git cms-addpkg RecoBTag/Combined
+    scram b -j 10
+
+- Step 2: Add models to ``RecoBTag/Combined``. First, fork `RecoBTag model repo <https://github.com/cms-data/RecoBTag-Combined>`_. Then git clone your forked model repo. 
+
+.. code-block:: bash
+
+    git clone <ssh clone your RecoBTag-Combined repo>  RecoBTag/Combined/data/
+
+Now take a look at the structure of the two packages. 
+
+``ONNXRuntime/plugins/`` defines the producers.
+``ONNXRuntime/python/`` make producer part of a CMS Process. This is what being called in the cmsConfig.
+``ONNXRuntime/interface/`` header files for utilities that are used by plugins.
+``ONNXRuntime/src/`` C files for definition of utilities that are used by the plugins.
+``Combined/data/models/`` It should be identical to what is loaded by the SONIC triton server. For new models, we need to move the model to this folder, and create a link in the original folder, such that the original workflow is not interupted.
+
+- Step 3: Let's edit the SONIC producer, and see what happens. Go to ``ONNXRuntime/plugins/ParticleTransformerAK4ONNXJetTagsProducer.cc`` and add some printouts in function: ``ParticleTransformerAK4ONNXJetTagsProducer::produce``. You can also add some printouts for input size, or output inference scores.
+
+
+.. code-block:: cpp
+
+    std::cout << "In ParT ONNX producer" << std::endl;
+
+- Step 4: Compile. Go to the ``RecoBTag/`` and 
+
+.. code-block:: bash
+
+    scram b -j 10
+
+- Step 5: Try to run the AOD->MiniAOD step again with cmsRun cmsConfig, and see if it prints out what you expect. This is important in debugging.
+
+
+
 
 
 
