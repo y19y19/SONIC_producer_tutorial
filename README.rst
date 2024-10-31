@@ -34,6 +34,7 @@ Process the workflow
 - Step 2: Setup ``CMSSW_14_1_0_pre0`` in a proper file system location.
 
 .. code-block:: bash
+
     cmsrel CMSSW_14_1_0_pre0
     cd CMSSW_14_1_0_pre0/src/
     cmsenv
@@ -41,6 +42,7 @@ Process the workflow
 - Step 3: Generate the cmsConfig file.
 
 .. code-block:: bash
+
     mkdir test_sonic_2023
     cd test_sonic_2023/
     cmsDriver.py  --python_filename miniaod_2022_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniaod_2022.root --conditions 130X_mcRun3_2022_realistic_v5 --step PAT --geometry DB:Extended --filein "dbs:/TTto2L2Nu_HT-500_NJet-7_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22DRPremix-124X_mcRun3_2022_realistic_v12-v2/AODSIM" --era Run3,run3_miniAOD_12X --no_exec --mc -n 10
@@ -48,14 +50,18 @@ Process the workflow
 - Step 4: ``cmsRun`` the cmsConfig file, and get the miniAOD file generated. You can modify the input/output file name and number of events that you want to process.
 
 .. code-block:: bash
+
     cmsRun miniaod_2022_cfg.py
 
 
 Extract the inference results
 ------------
 Copy and run the a python script ``plotParTAK4.py`` that is provided by this repo. Make sure the MiniAOD root file name is correct in the python script. 
+
 .. code-block:: bash
+
     python3 plotParTAK4.py
+
 Please check the script and see how it extract information from MiniAOD file and creates histograms of the inference results.
 
 
