@@ -119,59 +119,15 @@ Now take a look at the structure of the two packages.
 - Step 5: Try to run the AOD->MiniAOD step again with cmsRun cmsConfig, and see if it prints out what you expect. This is important in debugging.
 
 
+SONIC Producer
+=============
 
-
-
-
-Usage
------
-
-Example of how to use the project in code:
-
-.. code-block:: python
-
-   from project_name import main_function
-   result = main_function(argument1, argument2)
-   print(result)
-
-Requirements
+Set up a server
 ------------
 
-- Python 3.x
-- Required libraries (e.g., ``requests``, ``numpy``)
-  
-Development
-===========
 
-To contribute to the project, follow these steps:
 
-1. Fork the repository
-2. Create a new branch
-3. Make changes and test
-4. Submit a pull request
 
-Running Tests
--------------
+Set up client
+------------
 
-Run tests with the following command:
-
-.. code-block:: bash
-
-   pytest
-
-File Structure
-==============
-
-A brief overview of the key files and directories:
-
-- ``project_name/``: The main project directory
-- ``tests/``: Contains tests for the project
-- ``README.rst``: Project documentation
-
-.. note::
-   Add any additional files and folders specific to your project.
-
-License
-=======
-
-This project is licensed under the MIT License - see the LICENSE file for details.
