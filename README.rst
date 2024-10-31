@@ -93,10 +93,15 @@ Original Producer
 Now take a look at the structure of the two packages. 
 
 ``ONNXRuntime/plugins/`` defines the producers.
+
 ``ONNXRuntime/python/`` make producer part of a CMS Process. This is what being called in the cmsConfig.
+
 ``ONNXRuntime/interface/`` header files for utilities that are used by plugins.
+
 ``ONNXRuntime/src/`` C files for definition of utilities that are used by the plugins.
+
 ``Combined/data/models/`` It should be identical to what is loaded by the SONIC triton server. For new models, we need to move the model to this folder, and create a link in the original folder, such that the original workflow is not interupted.
+
 
 - Step 3: Let's edit the SONIC producer, and see what happens. Go to ``ONNXRuntime/plugins/ParticleTransformerAK4ONNXJetTagsProducer.cc`` and add some printouts in function: ``ParticleTransformerAK4ONNXJetTagsProducer::produce``. You can also add some printouts for input size, or output inference scores.
 
