@@ -31,7 +31,8 @@ Process the workflow in Purdue Analysis Facility
 ------------
 
 - Step 1: Set up your grid certificate ``voms-proxy-init``.
-- Step 2: Use Python3 kernel and load ``cmsset_default.sh``
+
+- Step 2: Use Python3 kernel and load ``cmsset_default.sh``.
 
 .. code-block: bash
 
