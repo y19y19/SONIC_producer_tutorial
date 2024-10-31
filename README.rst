@@ -34,7 +34,7 @@ Process the workflow in Purdue Analysis Facility
 
 - Step 2: Use Python3 kernel and load ``cmsset_default.sh``.
 
-.. code-block: bash
+.. code-block:: bash
 
     conda activate /depot/cms/kernels/python3
     source /cvmfs/cms.cern.ch/cmsset_default.sh
