@@ -4,7 +4,7 @@ from DataFormats.FWLite import Handle, Events
 import numpy as np
 import pickle
 
-events_c = Events('miniaod_2022.root')
+events_c = Events('miniaod_2023.root')
 
 handleJ  = Handle("std::vector<pat::Jet>")
 pu_mitigation_technique = 'PUPPI' # PUPPI
