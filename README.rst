@@ -104,7 +104,7 @@ Now take a look at the structure of the two packages.
 
 ``ONNXRuntime/python/`` make producer part of a CMS Process. This is what being called in the cmsConfig.
 
-``ONNXRuntime/interface/`` header files for utilities that are used by plugins.
+``ONNXRuntime/interface/`` header files for utilities that are used by the plugins.
 
 ``ONNXRuntime/src/`` C files for definition of utilities that are used by the plugins.
 
@@ -126,14 +126,52 @@ Now take a look at the structure of the two packages.
 
 - Step 5: Try to run the AOD->MiniAOD step again with cmsRun cmsConfig, and see if it prints out what you expect. This is important in debugging.
 
+From Producer to cmsConfig that controls AOD->MiniAOD workflow
+------------
+The ``ParticleTransformerAK4ONNXJetTagsProducer.cc`` is compiled, and the share objects of ``ONNXRuntime`` is located at ``$CMSSW/lib/$SCRAM_ARCH/`` as ``libRecoBTagONNXRuntime.so`` and ``pluginRecoBTagONNXRuntimePlugins.so``. 
+
+Other than that, it also produces a ``pfParticleTransformerAK4JetTags_cfi.py`` file under ``$CMSSW_BASE/cfipython/$SCRAM_ARCH/RecoBTag/ONNXRuntime/`` which only contains input and output information of this producer.
+
+The ``_cfi`` file is called in ``$CMSSW_BASE/src/RecoBTag/ONNXRuntime/python/pfParticleTransformerAK4_cff.py``. The ``_cff`` file can define that in various situations (different data tier, different tasks) that the output of the producer is utilized differently.
+
+The ``_cff`` is called in ``PhysicsTools/PatAlgos/python/slimming/applyDeepBtagging_cff.py``. You can see that it creates a list of BTagging algorithms that will be processed in the AOD->MiniAOD step.
 
 SONIC Producer
 =============
 
 Set up a server
 ------------
+- Step 0: Start from a hammer node that has a GPU through terminal. Record the host address.
 
+.. code-block:: bash
 
+    ssh hammer-f006
+    hostname -i
+
+- Step 1: Get models that can run on Triton servers. There should be a repository for book-keeping all the models that in CMSSW that can be run on triton. However, this `repo <https://github.com/fastmachinelearning/sonic-models/tree/master>`_ seems out of date. Temporarily, create a ``models/`` in a proper location in the filesystem, and copy the ``RecoBTag/Combined/data/models/*`` under the ``models/``. 
+
+- Step 2: Get a triton singularity in your depot area or use a singularity that ready exists in your reach.
+
+- Step 3: Launch the triton server with triton singularity
+
+.. code-block:: bash
+
+    singularity exec --nv -e --no-home -B <PATH/TO>/models/:/models /depot/cms/users/yao317/triton_22.07-py3-geometric.sif tritonserver --model-repository=/models --metrics-port=8000 --grpc-port=8001 --http-port=8002
+
+It should pause at the following outputs:
+
+.. code-block:: bash
+
+    I1031 21:58:23.960084 3752860 grpc_server.cc:2450] Started GRPCInferenceService at 0.0.0.0:8001
+    I1031 21:58:23.960325 3752860 http_server.cc:3555] Started HTTPService at 0.0.0.0:8002
+    I1031 21:58:24.004816 3752860 http_server.cc:185] Started Metrics Service at 0.0.0.0:8000
+
+- Step 4: Monitor the Triton server. You can open another terminal, ssh to the server node, and then do
+
+.. code-block:: bash
+    watch -n 1 nvidia-smi
+
+You should see that triton server is a process on GPU. When the server starts to make inference, the GPU utilization and also the GPU memory in use will goes up.
 
 
 Set up client
