@@ -228,4 +228,6 @@ and modify ``allSonicTriton`` variable to include ``particleTransformerAK4SonicT
 
     cmsRun run.py maxEvents=10 sonic=True address=<Output of hostname -i> config=<cmsConfig file name> 
 
- 
+Compare results
+=============
+A MiniAOD file using SONIC is generated. You can now repeat what we've done for extracting the inference results from the original workflow. Compare the distributions, are they identical?
