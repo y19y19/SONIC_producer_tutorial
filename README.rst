@@ -27,7 +27,7 @@ Please note that for locally generate a cmsConfig, we don't have environmental v
 
 To briefly understand the structure of a CMS configuration file, you can read `CMSConfigFileIntro <https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookConfigFileIntro>`_
 
-Process the workflow in Purdue Analysis Facility
+Process the workflow on the cms-fe node
 ------------
 
 - Step 1: Set up your grid certificate ``voms-proxy-init``.
@@ -46,8 +46,7 @@ Process the workflow in Purdue Analysis Facility
     cmsrel CMSSW_14_1_0_pre0
     cd CMSSW_14_1_0_pre0/src/
     cmsenv
-    git cms-init
-    scram b -j 10
+    git cms-init # It activates the git activities with CMSSW git repo. Otherwise it will not know git informations.
 
 - Step 4: Generate the cmsConfig file.
 
@@ -84,10 +83,12 @@ Do you know where the producer is defined? See the next section...
 
 Original Producer
 =============
-- Step 1: Check out the following packages under ``$CMSSW_BASE/src/`` and compile.
+- Step 1: Start a clean terminal (No conda). Check out the following packages under ``$CMSSW_BASE/src/`` and compile.
 
 .. code-block:: bash
 
+    cd $CMSSW_BASE/src/
+    cmsenv
     git cms-addpkg RecoBTag/ONNXRuntime
     git cms-addpkg RecoBTag/Combined
     scram b -j 10
@@ -171,9 +172,61 @@ It should pause at the following outputs:
 .. code-block:: bash
     watch -n 1 nvidia-smi
 
-You should see that triton server is a process on GPU. When the server starts to make inference, the GPU utilization and also the GPU memory in use will goes up.
+You should see that ``triton server`` is a process on the GPU. When the server starts to make inference, the GPU utilization and the GPU memory in use will go up. 
 
 
 Set up client
 ------------
 
+- Step 1: Add more packages from CMSSW. Please ignore all the warning messages as long as the compilation completes. Take a look at the packages you have under ``$CMSSW/src/``. 
+
+.. code-block:: bash
+
+    cd $CMSSW_BASE/src/
+    cmsenv
+    git cms-addpkg HeterogeneousCore/SonicTriton/ # We don't edit this package, but it is how the game works under the table.
+    git cms-addpkg Configuration/ProcessModifiers/
+    scram b -j 10
+
+- Step 2: Under ``RecoBTag/ONNXRuntime/`` 
+
+1. Update the files under ``interface/`` and ``src/`` with the ones in ``CMSSW_14_1_0``. This is for some code format changes compared to the ones in the CMSSW_14_1_0_pre0. 
+
+2. Update the ParT original producer, and add the sonic producer in ``plugins/`` with the ones in ``CMSSW_14_1_0``.
+
+3. Update the ``pfParticleTransformerAK4_cff.py`` under ``python/`` with the one in ``CMSSW_14_1_0``.
+
+- Step 3: Under ``Configuration/ProcessModifiers/python/``:
+
+1. Create a file ``particleTransformerAK4SonicTriton_cff.py`` and put the following lines into the file:
+
+.. code-block:: python
+
+    import FWCore.ParameterSet.Config as cms
+    
+    particleTransformerAK4SonicTriton = cms.Modifier()
+
+2. Modify ``allSonicTriton_cff.py``, add 
+
+.. code-block:: python
+
+    from Configuration.ProcessModifiers.particleTransformerAK4SonicTriton_cff import particleTransformerAK4SonicTriton
+
+and modify ``allSonicTriton`` variable to include ``particleTransformerAK4SonicTriton``
+
+- Step 4: Recompile
+
+.. code-block:: bash
+
+    cd $CMSSW_BASE/src/
+    scram b -j 10
+
+- Step 4: Copy ``run.py`` that is provided by this repo to under ``$CMSSW_BASE/src/test_sonic_2023/``. It allows SONIC as an option on top of the cmsConfig file. 
+
+- Step 5: While keeping the server running on a hammer-f node, run the ``run.py`` from the client.
+
+.. code-block:: bash
+
+    cmsRun run.py maxEvents=10 address=<Output of hostname -i> config=<cmsConfig file name> 
+
+ 
