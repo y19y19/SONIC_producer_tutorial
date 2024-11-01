@@ -213,16 +213,16 @@ Set up client
 
 and modify ``allSonicTriton`` variable to include ``particleTransformerAK4SonicTriton``
 
-- Step 4: Recompile
+- Step 4: Recompile (always recompile after you change cpp files and header files)
 
 .. code-block:: bash
 
     cd $CMSSW_BASE/src/
     scram b -j 10
 
-- Step 4: Copy ``run.py`` that is provided by this repo to under ``$CMSSW_BASE/src/test_sonic_2023/``. It allows SONIC as an option on top of the cmsConfig file. 
+- Step 5: Copy ``run.py`` that is provided by this repo to under ``$CMSSW_BASE/src/test_sonic_2023/``. It allows SONIC as an option on top of the cmsConfig file. 
 
-- Step 5: While keeping the server running on a hammer-f node, run the ``run.py`` from the client.
+- Step 6: While keeping the server running on a hammer-f node, run the ``run.py`` from the client.
 
 .. code-block:: bash
 
