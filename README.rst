@@ -30,16 +30,9 @@ To briefly understand the structure of a CMS configuration file, you can read `C
 Process the workflow on the cms-fe node
 ------------
 
-- Step 1: Set up your grid certificate ``voms-proxy-init``.
-
-- Step 2: Use Python3 kernel and load ``cmsset_default.sh``.
-
-.. code-block:: bash
-
-    conda activate /depot/cms/kernels/python3
-    source /cvmfs/cms.cern.ch/cmsset_default.sh
+- Step 1: Set up your grid certificate ``voms-proxy-init``. (Optional if you are using a local AOD file as input instead of a dataset on the grid.)
     
-- Step 3: Setup ``CMSSW_14_1_0_pre0`` in a proper file system location.
+- Step 2: Setup ``CMSSW_14_1_0_pre0`` in a proper file system location.
 
 .. code-block:: bash
 
@@ -48,7 +41,7 @@ Process the workflow on the cms-fe node
     cmsenv
     git cms-init # It activates the git activities with CMSSW git repo. Otherwise it will not know git informations.
 
-- Step 4: Generate the cmsConfig file.
+- Step 3: Generate the cmsConfig file.
 
 .. code-block:: bash
 
@@ -56,7 +49,7 @@ Process the workflow on the cms-fe node
     cd test_sonic_2023/
     cmsDriver.py --python_filename miniaod_2023_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniaod_2023.root --conditions 130X_mcRun3_2023_realistic_v14 --step PAT --geometry DB:Extended --filein file:/depot/cms/users/yao317/datasets/TTto2L2Nu_HT-500_NJet-7_TuneCP5_13p6TeV_powheg-pythia8_Run3Summer23DRPremix-130X_mcRun3_2023_realistic_v14-v3/0055c37c-9761-494d-83a8-e7820258686b.root --era Run3_2023 --no_exec --mc -n 10
 
-- Step 5: ``cmsRun`` the cmsConfig file, and get the miniAOD file generated. You can modify the input/output file name and number of events that you want to process.
+- Step 4: ``cmsRun`` the cmsConfig file, and get the miniAOD file generated. You can modify the input/output file name and number of events that you want to process.
 
 .. code-block:: bash
 
@@ -65,10 +58,15 @@ Process the workflow on the cms-fe node
 
 Extract the inference results
 ------------
-Copy and run the a python script ``plotParTAK4.py`` that is provided by this repo. Make sure the MiniAOD root file name is correct in the python script. 
+Copy and run the a python script ``plotParTAK4.py`` that is provided by this repo. Make sure the MiniAOD root file name is correct in the python script. (FIXME: Somehow the script breaks with python3 on fe node and AF, use conda env only for this step)
 
 .. code-block:: bash
 
+    conda activate /depot/cms/kernels/python3
+    source /cvmfs/cms.cern.ch/cmsset_default.sh
+    cd $CMSSW_BASE/src/
+    cmsenv
+    cd test_sonic_2023/
     python3 plotParTAK4.py
 
 Please check the script and see how it extract information from MiniAOD file and creates histograms of the inference results.
@@ -170,6 +168,7 @@ It should pause at the following outputs:
 - Step 4: Monitor the Triton server. You can open another terminal, ssh to the server node, and then do
 
 .. code-block:: bash
+
     watch -n 1 nvidia-smi
 
 You should see that ``triton server`` is a process on the GPU. When the server starts to make inference, the GPU utilization and the GPU memory in use will go up. 
@@ -227,6 +226,6 @@ and modify ``allSonicTriton`` variable to include ``particleTransformerAK4SonicT
 
 .. code-block:: bash
 
-    cmsRun run.py maxEvents=10 address=<Output of hostname -i> config=<cmsConfig file name> 
+    cmsRun run.py maxEvents=10 sonic=True address=<Output of hostname -i> config=<cmsConfig file name> 
 
  
